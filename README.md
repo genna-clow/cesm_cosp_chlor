@@ -1,2 +1,2 @@
-# cesm_cosp_chlor
+# CESM COSP for Chlorophyll
 Analysis of CESM simulations using the chlorophyll satellite emulator
