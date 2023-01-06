@@ -6,8 +6,11 @@ import matplotlib as mpl
 from matplotlib.colors import ListedColormap, BoundaryNorm
 import matplotlib.colors as colors
 from matplotlib import ticker
+from matplotlib.ticker import FormatStrFormatter
+import matplotlib.dates as mdates
 import cartopy
 import cartopy.crs as ccrs
+import seaborn as sns
 
 ## Define Biome Colors
 color_list = np.concatenate((mpl.cm.tab20(range(0,6)), mpl.cm.tab20(range(8,19))), axis = 0)
@@ -141,4 +144,61 @@ def pop_add_cyclic(ds):
                 
             
     return dso
+    
+    
+def seasonal_cycle(df_clouds, df_baseline, cloud_lim = [50,100], chlor_lim = [0, 4]):
+    '''
+    Plot the mean seasonal cycle for cloud-obscured and baseline outputs. 
+    The upper subplot shows the missing data and the lower subplot shows the mean chlorophyll concentration.
+    
+    Parameters
+    ----------
+    df_clouds : pd.DataFrame
+        Datafame with columns 'month', 'percent_missing', and 'mean_chl'. This is the output from the calc_missing_data_cesm function. 
+    df_baseline : pd.DataFrame
+        Datafame with columns 'month', and 'mean_chl'. This is the output from the calc_missing_data_cesm function. 
+    
+    ''' 
+    
+    sns.set(rc={"figure.figsize":(10, 7)})
+    sns.set_style("whitegrid")
+
+    fig, axes = plt.subplots(2, 1, sharex=True, figsize=(10,8))
+
+    axes = axes.flatten()
+
+    ax1 = sns.lineplot(x = df_clouds['month'], 
+                     y = df_clouds['percent_missing']*100, 
+                     estimator = 'mean', linewidth=2, ax = axes[0])
+
+    ax1.set_ylim(cloud_lim)
+
+    ax1.set_yticklabels(ax1.get_yticks(), size = 16)
+    ax1.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+    ax1.set_ylabel("Missing Data (%)", fontsize = 18)
+
+
+    ax2 = sns.lineplot(data = df_baseline, 
+                       x = 'month', y = 'mean_chl', label = 'Baseline',
+                       estimator = 'mean', linewidth=2, color = 'black', 
+                       alpha = 0.5, ax = axes[1])
+
+    ax2 = sns.lineplot(data = df_clouds, 
+                       x = 'month', y = 'mean_chl', label = 'Cloud-Masked',
+                     estimator = 'mean', linewidth=2, color = 'green', 
+                     alpha = 1, zorder = 1, ax = axes[1])
+
+
+    ax2.set_xticklabels(ax2.get_xticks(), size = 18)
+    date_form = mdates.DateFormatter('%b')
+    ax2.xaxis.set_major_formatter(date_form)
+    ax2.set_xlabel("")
+
+    ax2.set_ylim(chlor_lim)
+    ax2.set_yticklabels(ax2.get_yticks(), size = 16)
+    ax2.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+    ax2.set_ylabel("Chlorophyll Conc. (mg/m3)", fontsize = 18)
+    ax2.legend(fontsize = 18)
+    
+    fig.align_ylabels()
     
