@@ -146,7 +146,7 @@ def pop_add_cyclic(ds):
     return dso
     
     
-def seasonal_cycle(df_clouds, df_baseline, cloud_lim = [50,100], chlor_lim = [0, 4]):
+def seasonal_cycle(df_clouds, df_baseline, cloud_lim = [70,100], chlor_lim = [0, 4]):
     '''
     Plot the mean seasonal cycle for cloud-obscured and baseline outputs. 
     The upper subplot shows the missing data and the lower subplot shows the mean chlorophyll concentration.
